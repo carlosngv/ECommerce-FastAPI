@@ -13,6 +13,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # ? Runs one time
     await create_tables()
     yield
     if sessionmanager._engine is not None:

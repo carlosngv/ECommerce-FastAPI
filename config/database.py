@@ -36,7 +36,6 @@ class DataBaseSessionManager:
 
         async with self._engine.begin() as connection:
             try:
-                await self.create_all(connection)
                 yield connection
             except Exception:
                 await connection.rollback()
