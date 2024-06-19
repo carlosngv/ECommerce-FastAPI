@@ -13,3 +13,19 @@ class Business(BaseModel):
     business_description: Annotated[str, Field(min_length=10, max_length=50)]
     logo: str
     owner: str
+
+class BusinessCreate(BaseModel):
+    business_name: Annotated[str, Field(min_length=8, max_length=25)]
+    city: str
+    region: str
+    business_description: Annotated[str, Field(min_length=10, max_length=50)]
+    logo: str
+    owner: str
+
+class BusinessUpdate(BaseModel):
+    business_name: Annotated[str, Field(min_length=8, max_length=25)]
+    city: str
+    region: str
+    business_description: Annotated[str, Field(min_length=10, max_length=50)]
+    logo: str
+    owner: str

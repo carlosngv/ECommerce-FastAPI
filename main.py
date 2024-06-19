@@ -11,6 +11,23 @@ from routers.users import user_router
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
+fake_users = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "fakehashedsecret",
+        "disabled": False,
+    },
+    "alice": {
+        "username": "alice",
+        "full_name": "Alice Wonderson",
+        "email": "alice@example.com",
+        "hashed_password": "fakehashedsecret2",
+        "disabled": True,
+    },
+}
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ? Runs one time
@@ -20,6 +37,8 @@ async def lifespan(app: FastAPI):
         await sessionmanager.close()
 
 app = FastAPI(lifespan=lifespan, title='ECommerceAPI', docs_url='/api/docs')
+
+
 
 app.include_router(user_router, prefix='/api', tags=['user'])
 

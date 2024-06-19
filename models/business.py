@@ -1,4 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from schemas import BusinessCreate
+
 from . import Base
 
 class BusinessTable(Base):
@@ -10,3 +14,7 @@ class BusinessTable(Base):
     business_description: Mapped[str]
     logo: Mapped[str]
     owner: Mapped[str]
+
+    @classmethod
+    async def create(db: AsyncSession,):
+        pass

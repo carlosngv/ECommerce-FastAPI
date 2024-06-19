@@ -25,7 +25,7 @@ class DataBaseSessionManager:
     async def close(self):
         if self._engine is None:
             raise Exception('DataBaseSessionManager is not initialized')
-        await self._engine.disponse()
+        await self._engine.dispose()
         self._engine = None
         self._sessionmaker = None
 

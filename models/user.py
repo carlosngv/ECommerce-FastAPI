@@ -6,13 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from . import Base
+from utils.pass_hash import hash_password, verify_password
 
 class UserTable(Base):
 
     __tablename__ = 'user'
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str] = String()
+    password: Mapped[str] = mapped_column(String(150))
     is_verified: Mapped[bool] = mapped_column(insert_default=False)
     join_data: Mapped[datetime] = mapped_column(insert_default=func.now())
 
@@ -20,6 +21,7 @@ class UserTable(Base):
     async def create(cls, db: AsyncSession, **new_user: dict):
         # ? gets
         transaction = cls(**new_user)
+        transaction.password = hash_password(transaction.password)
         db.add(transaction)
         await db.commit()
         await db.refresh(transaction)
@@ -35,12 +37,51 @@ class UserTable(Base):
         return transaction
 
     @classmethod
-    async def get_all(cls, db: AsyncSession):
+    async def authenticate_user(cls, db: AsyncSession, email, password):
         try:
-            transaction = await db.execute(select(cls)).scalars().all()
+            user = await cls.get_by_email(db, email)
+            if not user:
+                return None
+            # ? Hashed password verification
+            pass_result = verify_password(password, user.password)
+
+            if not pass_result:
+                return None
+
+            return True
         except NoResultFound as e:
             return None
+
+    @classmethod
+    async def get_by_email(cls, db: AsyncSession, email: str):
+        try:
+            stmt = select(cls).where(cls.email == email)
+            results = await db.execute(stmt)
+            # ? Is better to store results first, and then access
+            transaction = results.scalars().one()
+        except NoResultFound as e:
+            return None
+
         return transaction
+
+    @classmethod
+    async def get_all(cls, db: AsyncSession):
+        try:
+            result = await db.execute(select(cls))
+            transaction = result.scalars().all()
+        except NoResultFound as e:
+            return None
+
+        return transaction
+
+    @classmethod
+    async def get_verified_user(cls, db: AsyncSession, email: str) -> bool:
+        db_user = cls.get_by_email(db, email)
+        if not db_user:
+            return False
+        if db_user.is_verified:
+            return True
+        return False
 
     @classmethod
     async def update(cls, db: AsyncSession,  id: str, **update_user: dict):
