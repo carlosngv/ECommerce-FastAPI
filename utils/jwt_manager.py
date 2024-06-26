@@ -1,11 +1,11 @@
 import jwt
 from typing import Union
-from schemas import Token
+from decouple import config
 from datetime import timedelta, datetime, timezone
 
-SECRET_KEY = "b777ced068c79bb7ce8b7aba35a807346bc7abcc27b375ed25d8d0cff6390f54"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = config('SECRET_KEY')
+ALGORITHM = config('ALGORITHM')
+ACCESS_TOKEN_EXPIRE_MINUTES = config('ACCESS_TOKEN_EXPIRE_MINUTES')
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     payload = data.copy()

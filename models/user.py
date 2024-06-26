@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import func, String, select
+from sqlalchemy import func, String, select, update
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
@@ -113,4 +113,20 @@ class UserTable(Base):
 
         await db.commit()
         await db.refresh(db_user)
+        return db_user
+
+    @classmethod
+    async def activate(cls, db: AsyncSession, id: str):
+        db_user = await cls.get(db, id)
+        if not db_user:
+            return None
+
+        stmt = (
+            update(cls)
+            .where(cls.id == id)
+            .values(is_verified=True)
+        )
+
+        await db.execute(stmt)
+        await db.commit()
         return db_user

@@ -5,7 +5,6 @@ from typing import Any, AsyncIterator
 from sqlalchemy.ext.asyncio import (
     AsyncConnection,
     AsyncSession,
-    AsyncEngine,
     async_sessionmaker,
     create_async_engine
 )
@@ -62,7 +61,7 @@ class DataBaseSessionManager:
     async def drop_all(self, connection: AsyncConnection) -> None:
         await connection.run_sync(Base.metadata.drop_all)
 
-sessionmanager = DataBaseSessionManager(DB_URL, {'echo': True})
+sessionmanager = DataBaseSessionManager(DB_URL, {'echo': False})
 
 
 async def get_db():

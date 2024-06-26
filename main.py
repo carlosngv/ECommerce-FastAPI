@@ -7,26 +7,9 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from config.database import sessionmanager, create_tables
-from routers.users import user_router
+from routers import auth_router, user_router, business_router
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
-fake_users = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "fakehashedsecret",
-        "disabled": False,
-    },
-    "alice": {
-        "username": "alice",
-        "full_name": "Alice Wonderson",
-        "email": "alice@example.com",
-        "hashed_password": "fakehashedsecret2",
-        "disabled": True,
-    },
-}
+# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,7 +23,9 @@ app = FastAPI(lifespan=lifespan, title='ECommerceAPI', docs_url='/api/docs')
 
 
 
+app.include_router(auth_router, prefix='/api', tags=['auth'])
 app.include_router(user_router, prefix='/api', tags=['user'])
+app.include_router(business_router, prefix='/api', tags=['business'])
 
 if __name__ == '__main__':
     uvicorn.run('main:app', reload=True)
